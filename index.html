@@ -21,13 +21,13 @@
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             text-align: center;
-            max-width: 400px;
+            max-width: 450px;
             width: 100%;
         }
         h2 { color: #f2f3f5; margin-bottom: 15px; }
         p { font-size: 14px; color: #949ba4; word-break: break-all; }
         .success { color: #23a55a; font-weight: bold; }
-        .error { color: #f23f43; font-weight: bold; }
+        .error { color: #f2f3f5; text-align: left; background: #1e1f22; padding: 10px; border-radius: 5px; margin-top: 10px; font-family: monospace; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -40,17 +40,15 @@
     </div>
 
     <script>
-        // パソコンで動いているPythonボット（ngrok経由）のAPIエンドポイント
+        // 今回のngrok URLに /api/auth を繋げたエンドポイント
         const BOT_API_URL = "https://worsening-superhero-smile.ngrok-free.dev/api/auth";[cite: 1]
 
-        // URLのパラメータから `code` を自動で取得する
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         const contentDiv = document.getElementById('content');
 
         async function sendCode(authCode) {
             try {
-                // パソコン上のボットへ自動送信
                 const response = await fetch(BOT_API_URL, {
                     method: 'POST',
                     headers: { 
@@ -59,23 +57,29 @@
                     body: JSON.stringify({ code: authCode })
                 });
 
-                const result = await response.json();
+                const textRes = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(textRes);
+                } catch (e) {
+                    result = { message: textRes };
+                }
 
                 if (response.ok) {
                     contentDiv.innerHTML = `
                         <p class="success">✅ 認証が完了し、サーバーへの自動追加まで成功しました！</p>
-                        <p style="font-size: 12px; margin-top: 10px;">この画面は閉じても大丈夫です。</p>
+                        <p style="font-size: 12px; margin-top: 10px; color: #949ba4;">この画面は閉じても大丈夫です。</p>
                     `;
                 } else {
                     contentDiv.innerHTML = `
-                        <p class="error">❌ 処理に失敗しました。</p>
-                        <p style="font-size: 12px; color: #949ba4;">詳細: ${result.message || '不明なエラー'}</p>
+                        <p style="color: #f23f43; font-weight: bold;">❌ ボット側でエラーが発生しました。</p>
+                        <div class="error">Status: ${response.status}<br>Detail: ${result.message || '不明'}</div>
                     `;
                 }
             } catch (err) {
                 contentDiv.innerHTML = `
-                    <p class="error">❌ ボットへの接続に失敗しました。</p>
-                    <p style="font-size: 12px; color: #949ba4;">パソコンでボットとngrokが起動しているか確認してください。</p>
+                    <p style="color: #f23f43; font-weight: bold;">❌ 接続に失敗しました。</p>
+                    <div class="error">原因: ${err.message}<br><br>※パソコンでPythonボットとngrokが起動しているか確認してください。</div>
                 `;
             }
         }
@@ -84,8 +88,7 @@
             sendCode(code);
         } else {
             contentDiv.innerHTML = `
-                <p class="error">❌ 認証コードが見つかりません。</p>
-                <p>正しいURLからアクセスしてください。</p>
+                <p style="color: #f23f43; font-weight: bold;">❌ 認証コードが見つかりません。</p>
             `;
         }
     </script>
