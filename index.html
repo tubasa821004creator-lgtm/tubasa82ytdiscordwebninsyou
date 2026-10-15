@@ -3,95 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Bedrock認証</title>
+    <title>Discord 認証</title>
     <style>
-        body {
-            background-color: #313338;
-            color: #dbdee1;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background-color: #2b2d31;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            text-align: center;
-            max-width: 450px;
-            width: 100%;
-        }
-        h2 { color: #f2f3f5; margin-bottom: 15px; }
-        p { font-size: 14px; color: #949ba4; word-break: break-all; }
-        .success { color: #23a55a; font-weight: bold; }
-        .error { color: #f2f3f5; text-align: left; background: #1e1f22; padding: 10px; border-radius: 5px; margin-top: 10px; font-family: monospace; font-size: 12px; }
+        body { background-color: #313338; color: #dbdee1; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background-color: #2b2d31; padding: 30px; border-radius: 8px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .btn { display: inline-block; background-color: #5865F2; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold; margin-top: 15px; }
+        .btn:hover { background-color: #4752C4; }
     </style>
 </head>
 <body>
-
     <div class="card">
-        <h2>Discord認証システム</h2>
-        <div id="content">
-            <p>認証情報を処理しています...</p>
-        </div>
+        <h2>サーバー参加認証</h2>
+        <p>下のボタンを押してDiscord連携を完了してください。</p>
+        <!-- 実際のDiscord認可URL（client_idとredirect_uriを設定したもの）に書き換えてください -->
+        <a href="https://discord.com/api/oauth2/authorize?client_id=1560085371210047541&redirect_uri=https%3A%2F%2Ftubasa82ytdiscordwebninsyou.vercel.app%2F&response_type=code&scope=identify+guilds.join" class="btn">Discordで認証する</a>
     </div>
-
-    <script>
-        // 最新のngrok URLを指すエンドポイント
-        const BOT_API_URL = "https://worsening-superhero-smile.ngrok-free.dev/api/auth";[cite: 1]
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const contentDiv = document.getElementById('content');
-
-        async function sendCode(authCode) {
-            try {
-                const response = await fetch(BOT_API_URL, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ code: authCode })
-                });
-
-                const textRes = await response.text();
-                let result;
-                try {
-                    result = JSON.parse(textRes);
-                } catch (e) {
-                    result = { message: textRes };
-                }
-
-                if (response.ok) {
-                    contentDiv.innerHTML = `
-                        <p class="success">✅ 認証が完了し、サーバーへの自動追加まで成功しました！</p>
-                        <p style="font-size: 12px; margin-top: 10px; color: #949ba4;">この画面は閉じても大丈夫です。</p>
-                    `;
-                } else {
-                    contentDiv.innerHTML = `
-                        <p style="color: #f23f43; font-weight: bold;">❌ ボット側でエラーが発生しました。</p>
-                        <div class="error">Status: ${response.status}<br>Detail: ${result.message || '不明'}</div>
-                    `;
-                }
-            } catch (err) {
-                contentDiv.innerHTML = `
-                    <p style="color: #f23f43; font-weight: bold;">❌ 接続に失敗しました。</p>
-                    <div class="error">原因: ${err.message}<br><br>※パソコンでPythonボットとngrokが起動しているか確認してください。</div>
-                `;
-            }
-        }
-
-        if (code) {
-            sendCode(code);
-        } else {
-            contentDiv.innerHTML = `
-                <p style="color: #f23f43; font-weight: bold;">❌ 認証コードが見つかりません。</p>
-            `;
-        }
-    </script>
-
 </body>
 </html>
