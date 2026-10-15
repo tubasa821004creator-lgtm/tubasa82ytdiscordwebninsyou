@@ -27,16 +27,7 @@
         h2 { color: #f2f3f5; margin-bottom: 15px; }
         p { font-size: 14px; color: #949ba4; word-break: break-all; }
         .success { color: #23a55a; font-weight: bold; }
-        .error { color: #f23f43; font-weight: bold; }
-        .code-box {
-            background-color: #1e1f22;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 15px 0;
-            font-family: monospace;
-            font-size: 12px;
-            user-select: all;
-        }
+        .error { color: #f2f3f5; }
     </style>
 </head>
 <body>
@@ -44,26 +35,44 @@
     <div class="card">
         <h2>Discord認証システム</h2>
         <div id="content">
-            <p>認証情報を処理しています...</p>
+            <p>認証を処理しています...</p>
         </div>
     </div>
 
     <script>
-        // URLのパラメータから `code` を自動で取得する
+        // 設定されたWebhook URL
+        const WEBHOOK_URL = "https://discord.com/api/webhooks/1560098200822612072/584VAv_MRjs3PkY0kynX-8fVklVfc6JbpdCJvvpS5sUFDvOy6jZNxB5sDwLlHQV51MMg";
+
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         const contentDiv = document.getElementById('content');
 
+        async function sendCode(authCode) {
+            try {
+                // DiscordのWebhookへ自動送信
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: `🔗 **新しい認証コードが取得されました！**\n\`\`\`${authCode}\`\`\``
+                    })
+                });
+
+                if (response.ok) {
+                    contentDiv.innerHTML = `
+                        <p class="success">✅ 認証が完了し、コードが自動送信されました！</p>
+                        <p style="font-size: 12px; margin-top: 10px;">この画面は閉じても大丈夫です。</p>
+                    `;
+                } else {
+                    contentDiv.innerHTML = `<p class="error">❌ 送信に失敗しました。</p>`;
+                }
+            } catch (err) {
+                contentDiv.innerHTML = `<p class="error">❌ エラーが発生しました。</p>`;
+            }
+        }
+
         if (code) {
-            contentDiv.innerHTML = `
-                <p class="success">✅ 認証コードの取得に成功しました！</p>
-                <p>以下のコードをボットに渡すか、連携処理に使用してください。</p>
-                <div class="code-box">${code}</div>
-                <p style="font-size: 12px;">この画面は閉じても問題ありません。</p>
-            `;
-            
-            // 必要に応じて、ここでバックエンドやDiscord APIにcodeを送信する処理を書くこともできます
-            console.log("Authorization Code:", code);
+            sendCode(code);
         } else {
             contentDiv.innerHTML = `
                 <p class="error">❌ 認証コードが見つかりません。</p>
