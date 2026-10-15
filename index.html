@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Bedrock認証</title>
+    <style>
+        body {
+            background-color: #313338;
+            color: #dbdee1;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background-color: #2b2d31;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 { color: #f2f3f5; margin-bottom: 15px; }
+        p { font-size: 14px; color: #949ba4; word-break: break-all; }
+        .success { color: #23a55a; font-weight: bold; }
+        .error { color: #f23f43; font-weight: bold; }
+        .code-box {
+            background-color: #1e1f22;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 12px;
+            user-select: all;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Discord認証システム</h2>
+        <div id="content">
+            <p>認証情報を処理しています...</p>
+        </div>
+    </div>
+
+    <script>
+        // URLのパラメータから `code` を自動で取得する
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const contentDiv = document.getElementById('content');
+
+        if (code) {
+            contentDiv.innerHTML = `
+                <p class="success">✅ 認証コードの取得に成功しました！</p>
+                <p>以下のコードをボットに渡すか、連携処理に使用してください。</p>
+                <div class="code-box">${code}</div>
+                <p style="font-size: 12px;">この画面は閉じても問題ありません。</p>
+            `;
+            
+            // 必要に応じて、ここでバックエンドやDiscord APIにcodeを送信する処理を書くこともできます
+            console.log("Authorization Code:", code);
+        } else {
+            contentDiv.innerHTML = `
+                <p class="error">❌ 認証コードが見つかりません。</p>
+                <p>正しいURLからアクセスしてください。</p>
+            `;
+        }
+    </script>
+
+</body>
+</html>
